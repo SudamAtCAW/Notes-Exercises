@@ -1,0 +1,726 @@
+Javascript Engine:
+When we run a javascript program the javascript engine reads the program and converts it into
+machine executable code which is read by the computer. Brendan Eich is the first person who 
+created the javascript engine.
+-------------------------------------------------------------
+| Inside the Engine:                                         |
+|Parser-> AST(Abstract syntax tree)->Interpreter->Bytecode   |
+|                  |                                         |
+|              Profiler -- Compiler -> Optimized code        |
+|                                                            |
+---------------------------------------------------------------
+AST breaks our program into different things that are happening.
+
+Interpreters:
+There are two ways to translate a program into machine executable code, Interpreter and Compiler.
+Interpreter reads our code line by line.The translation happens line by line on the fly.
+Interpreting means taking a set of instructions and returning an answer.
+
+Compiler :
+Compiler first takes our whole program, tries to understand what we want to do and takes our
+language and changes it into something.
+
+All languages have to be complied or interpreted.
+
+Babel:
+Babel is a Javascript compiler that takes your modern JS code and returns  browser compatible
+JS (older JS code).
+
+Typescript:
+Typescript is a superset of Javascript that compiles down to Javascript.
+Both(Babel,Typescript) of these do exactly what compilers do: Take one language and convert into a 
+different one!
+
+Interpreter reads our code line by line, It doesn't convert our code into other languages. 
+That's why interpreters are a fit for java script. But there is con of interpreters.
+When we run the same code again the interpreter gets slower.
+And thats where Compiler comes into play.The compiler takes bit more time to read the code
+The compiler takes our whole code and instead of calling the same code again and again it 
+just replaces this code with some values. 
+Now we don't need to run the code again to get it's value.
+The compiler doesn't need to repeat the translation for each pass through.In that loop , the
+code generated from it is actually faster and these sort of edits are called optimization
+
+JIT(Just In Time)Compiler:(Combination of Interpreter and compiler)
+When the code gets sent to the interpreter and in the V8 engine this is called ignition. It
+takes the AST and splits out bytecode. Bytecode is not lowlevel code as machine code but it 
+can be interpreted by the Javascript
+
+Profiler:
+It Monitors our code. It watches our code as it runs and makes notes on how we can optimize
+this code, such as how many times it is being run, what types are used in and how can the 
+code be optimized
+If the same lines of code are run a few times we actually pass off some off this code to the 
+compilier or a JIT compiler
+
+Is Javascript an Interpreted language?
+It depends on the implementation.
+
+Writing Optimized code:
+//inline caching
+when a same piece of code is run again and again , the compiler does something called 'inline
+caching' which remembers the output of the same piece of code. Whenever it gets called it will
+show the same output.
+
+//hidden classes
+function Animal(x,y){
+this.x = x;
+this.y = y;
+}
+
+const obj1 = new Animal(1,2);
+const obj2 = new Animal(3,4);
+
+obj1.a = 30;
+obj1.b =  100;
+//order break
+obj1.b = 30;
+obj1.b = 100;
+Hidden class is used by the compiler underneath the hood to determine that whether the obj1
+and obj2 has the same property or not and as soon as we introdue properties in different order
+it will get confused and will slow down.
+Make your code predictable for a machine as well as for a human.
+
+Call Stack & Memory Heap:
+The biggest thing javascript engine does for is reading our code and executing it.
+To do this we need a place to store and write information (to store variables and other data)
+And a placce to keep tack of what happening line by line in our code.
+We need memory heap allocate memory, release memory and remove memory- Memory heap
+with call stack we can keep an track of where we are in the code in its execution - Call stack
+When ever we write a method it first gets stored in the memory heap. When ever we run this 
+method it will be called from memory heap.
+Call stack is a region in memory which operates first in last out mode. When ever we call
+an method it adds the method over the stack, and when the method gets run it removes it from
+the stack area.
+Call stack stores functions and variables as our code executes. At each entry the state of the stack
+(stack frame) heplps us knowing where we are in the code.
+
+function subtractTwo(num){
+return num - 2;
+}
+
+function calcuate(){
+const sumTotal = 4 + 5;
+return subtractTwo(sumTotal);
+}
+debugger;
+calculate()
+
+Stackoverflow:
+Normaly the functions get popped off after they get execcuted, but when we have nested functions
+which just keeps on adding functions, we keep growing the stack larger and larger until it 
+overflows.
+
+function inception(){
+inception()
+}
+
+recursion always causes stackoverflow.
+
+Garbage Collection:
+Javascript cleansup the memory which we don't need anymore.It prevents memoryleaks. when ever
+a program is executed, javascript checks whether there are any objects or variables to whom 
+no one is referencing. Then it will remove those from the heap area.
+
+Memory leaks:
+let array = []
+for(let i = 5; i > 1; i++){
+array.push(i-1)
+} 
+
+Memory leaks is picies of code which has been used by the browser once and not needed anymore
+But it has not returned back to us to free memory.
+Global variables, Event listeners causes memory leaks.
+
+Single Threaded:
+Only one function can be ran at once.
+
+Synchronous:
+Only one thing can happen one time. The next thing will only be excuted when the first one 
+gets executed. Alert is a good example. You can't perform any tasks unless you clicked on ok.
+When we have long tasks it will be difficult.
+
+Javascript Runtime:
+It has only one stack and One heap.So if a program wants to execute something it has to wait
+until the previous one gets executed.
+
+Web API:
+While the call stack is executing programs one by one the web api of the browser (DOM, fetch(),
+setTimeOut() ) are working in the background concurrently. That is called asynchronous.
+
+Event Loop:
+Whenever the data fetching is completed by the web apis then the event loop will send the
+to call stack whenever the call stack gets free
+
+console.log('1');
+setTimeout(() =>{
+console.log('2'), 1000})
+console.log('3')
+
+the above code will output:
+1
+3
+2
+When the call stack reads the setTimeout(), it knows that it is a web api,so it moves to the 
+next argument, No matter how fast the response from setTimeout, it will only be executed when 
+the call stack is empty. 
+
+Node js:
+Node js is a c++ program that provides javascript runtime environment. It is built upon
+V8 engine of chrome.
+
+Exercise to prevent Stackoverflow:
+Question:
+const list = new Array(60000).join('1.1').split('.');
+ 
+function removeItemsFromList() {
+    var item = list.pop();
+ 
+    if (item) {
+        removeItemsFromList();
+    }
+};
+ 
+removeItemsFromList();
+
+Answer:
+const list = new Array(60000).join('1.1').split('.');
+
+function removeItemsFromList() {
+    var item = list.pop();
+
+    if (item) {
+      setTimeout(removeItemsFromList, 0);
+    }
+};
+
+removeItemsFromList();
+
+list
+
+Execution Context:
+function printName() {
+return 'Andrei Neagoie'
+}
+
+function findName() {
+return printName()
+}
+
+function sayMyName() {
+return findName()
+}
+
+sayMyName();
+
+Whenever we run sayMyname(), 
+the functions will get called into stack in this order
+sayMyName()-> findName()-> printName()-> 'Andrei Neagoie'
+After the name returns the functions will be removed from the stack on first in last out 
+basis.
+
+Wnen ever a javascript program runs, it runs inside a execution context(Global execution context)
+When ever we run a javascript file, javascript engine will create these two objects. Global
+object and This. And they are equal to each other.
+
+When we are using node, the window will be called Global instead. We can also assign variables
+to the global object, we can also add functions in it.
+There are 2 phases. 1.Creation phase 2. Execution phase
+when a program is run on javascript engine a Global execution context is created, when
+you run a program a function execution context is created until everything gets poped
+off from the call stack.
+
+Lexical Environment:
+When ever a new function is added to the call stack, a new environment is created. We can
+do different kind of things in that environment. From execution context we will get to 
+know currently we are in which environment.
+In javascript our lexical scope(available data + variables where the function was defined)
+determines our available variables. Not where the function is called(dynamic scope)
+The very first lexical environment in a program is Global().
+
+Hoisting:
+Hoisting is the process of moving variables and function declarations to the top of 
+the respective environment.
+During the creation phase javascript engine will read out the program and allocate memory for
+variables and functions before we execute it.
+Variables are partially hoisted where as functions are fully hoisted. 
+If we cover the function with in paranthises it won't be hoisted.
+
+Hoisting devides creation phase from execution phase.
+In hoisting of functions it always takes the last one in case of similar functions and 
+in case of varibale it prefers undefined over actual values.
+Hoisting happens on every execution context.
+Hoiating is confusing and makes our code unpredictable.
+Always try to avoid hoisting by using let and const
+
+Function Invocation:
+When ever we declare anything with in paranthises javascript takes it as a function.
+The arguments keyword returns an object of parametrs passed into into.
+Arguments is only available in execution context(during function execution) not in global
+
+Arguments looks like an array but it's not.
+function marry(person1, person2){
+console.log('argumets', arguments)
+console.log(Array.from(arguments))
+return `${person1} is now married to ${person2}`
+}
+//Always try to avoid arguments.
+function marry2(...args){
+console.log('arguments', arguments)
+console.log(Array.from(arguments))
+return `${args[0]} is now married to ${args[1]}`
+}
+marry2('Tim', 'Tina')
+By using ...args we can pass multiple parameters in runtime.
+In each execution context a new argument is created even though we haven't passed any
+
+Variable Environment:
+
+function two(){
+var isValid;
+}
+
+function one() {
+var isValid = true;
+two();
+}
+
+var isvalid = false;
+one();
+
+call stack
+//two() -- undefined
+//one() -- true
+// global --false
+In each execution context the variable have their own environment variable. outside their 
+local environment it has different values.
+
+Scope Chain:
+ var x = 'x'
+function findName() {       // here x can be accessed by each of the functions
+ var b = 'b';
+return printName();
+}
+
+function printName() {
+var c = 'c'
+return 'Andrei Neagoie'
+}
+
+function sayMyName() {
+var a = 'a';
+return findName()
+}
+
+sayMyName();
+
+All of the functions have global lexical environment. A global variable can be accessed 
+by any of the functions.   
+In javascript our lexical scope(available data + variables where the function was defined)
+determines our available variables. Not where the function is called(dynamic scope)
+
+function saymyName(){
+ var a = 'a';
+return function findName(){
+var b = 'b';
+return function printName(){
+var c = 'c';
+return 'Your Name'
+}
+}
+}
+
+SayMyName() // [function : findName]
+sayMyName()() // [function : printName]
+sayMyName()()() // Your Name
+
+Here we reached at the return 'Your Name' by using lexical scope chain.
+
+Function lexcical environment:
+Where one function is written in another function. And we can access them by the scope chain.
+by the help of function lexical environment we can also use the variables inside them
+We can only access the variables from the parent environments not from the child environment.
+
+Undefined in javascript is actually a type in javascript. It means the program have that 
+variable but it hasn't been assigned any values.
+When we get reference error it means it hasn't been declared.
+
+eval() and with changes the scope which makes it difficult for us.
+
+function weird(){
+height = 50;
+return height;
+}
+
+weird()
+
+As height is not declared with var, let, or const javascript will take it as global variable.
+to prevent this from happening type 'use strict' on the top of your code.
+
+var heyhey = function doodle() {
+return 'heyhey'
+}
+
+heyhey() //heyhey
+doodle() // reference error, here doodle is enclosed in its own scope.
+
+Function Scope Vs Block Scope:
+In function scope we can not access a variable from Outdide. But in Block scope we can
+Block Scope:
+if (5 > 4) {
+ var secret = '12345';
+}
+
+secret; //12345
+Function Scope:
+function a(){
+var secret = '12345'
+}
+
+secret; // reference error
+
+When we use const and let in block scope we can not access the variables.
+
+function loop(){
+for (let/var i = 5; i < 5; i++){
+console.log(i)
+}
+console.log('final', i)
+}
+loop()
+
+when we use var it will print the final i value but in case of let it will through an error. 
+
+Global Variables:
+Using global variables can pollute the global space and anyone can over write our variables.
+
+IIFE: Imediately invoked function expression
+To avoid global variable issue IIFE is used
+ an iife looks like
+
+(function () {
+
+})() // we can also specify these paranthyses inside the bracket too
+We can place all our local variable inside this to avoid any name collision.
+Here java script will first see the brackets, any will take them as a function expression
+instead of function
+We created an anonymous and called it immediately.
+We can not call a function immediately
+function () {} ()
+ but we can do it with a function expression.
+
+eg: 
+var script1 = (function (){ //here script1 is like a global environment
+function a() {
+return 5;
+}
+return {
+a: a
+}
+})()
+
+calling it:
+script1.a(); // 5
+IIFE helps us to bind private data into a function and creates a separate environment for us.
+
+THIS:
+This is the object that the function is a property of
+Or This is a reference variable which refers to the current calling object
+This always refers to Global object automatically.
+
+const obj = {
+name : 'CAW',
+greet() {
+return 'Welcome to ' + this.name // referred to the variavle of object
+},
+greetAgain(){
+return this.sing() + '!'; // referred to method of an object
+}
+}
+obj.greetAgain()
+
+Benifits of This:
+1.Gives methods acess to their object
+2.Execute same code for multiple object
+
+function importantPerson() {
+console.log(this.name+' !')
+}
+
+const name = 'sunny';
+const obj1 = {
+name: 'Myself',
+importantPerson: importantPerson
+}
+
+const obj2 = {
+name: 'Myself Only',
+importantPerson: importantPerson
+}
+
+This can also be understood as Who called me.
+
+Dynamic Scope VS Lexical Scope:
+Example 1:
+const a = function () {
+console.log('a', this) //this referres to global(window)
+const b = function() {
+console.log('b', this) //this refers to a which refers to window
+const c = {
+hi: function() {
+console.log('c', this) // as c is an object this refers to c
+}}
+c.hi()
+}
+b()
+}
+a()
+
+Example 2:
+
+const obj = {
+name: 'Billy',
+sing() {
+console.log('a', this); // this refers to window
+var anotherFunc = function(){
+console.log('b', this) //as anotherFunc is a nested function of sing(), when a nested function
+}                       // have this , it refers to window
+anotherFunc()
+}
+}
+
+obj.sing()
+In javascript our lexical scope (available data + variables where the function was defined)
+determines our available Variables. Not where the function is called (dynamic scope)
+This depends on how the function was called
+
+To overcome from this problem we can use arrow functions, arrow functions are lexically bound
+this came after es6 was introduced.
+const obj = {
+name: 'Billy',
+sing() {
+console.log('a', this); // this refers to window
+var anotherFunc=() => {
+console.log('b', this) //now this is lexically bound,
+}           
+anotherFunc()
+}
+}
+
+obj.sing();
+
+Before ES6
+
+const obj = {
+name: 'Billy',
+sing() {
+console.log('a', this); // this refers to window
+var anotherFunc = function(){
+console.log('b', this) 
+}                      
+return anotherFunc.bind(this)
+}
+}
+
+obj.sing()();
+
+Another Solution:
+
+const obj = {
+name: 'Billy',
+sing() {
+console.log('a', this); 
+var self = this; //passing the value of this of the obj and using the variable
+var anotherFunc = function(){
+console.log('b', self) 
+}                      
+return anotherFunc
+}
+}
+
+call() apply() bind()
+
+function a(){
+console.log('hi')
+}
+
+a.call() //it is same as a()
+a.apply() //also same as a() for now
+
+Uses of call() and apply()
+
+const wizard = {
+name: 'merlin',
+health: 50,
+heal() {
+return this.health = 100;
+}
+}
+
+const archer = {
+name: 'jenifer',
+health: 90,
+}
+console.log('1', archer)
+wizard.heal.call(archer)
+console.log('2', archer)
+
+Object Wizard has the heal power(method), by the help of call we can use it for other objects
+While invoking the heal method we have to pass the archer object as arguments
+ 
+const wizard = {
+name: 'merlin',
+health: 50,
+heal(num1,num2) {
+return this.health += num1 + num2;
+}
+}
+
+const archer = {
+name: 'jenifer',
+health: 90,
+}
+
+console.log('1', archer)
+wizard.heal.call(archer, 50, 30)
+console.log('2', archer)
+
+//we can also use the call with parameters as described above.
+
+The difference between call and apply is call takes parameters(in coma separated format)
+where as apply takes an array of parameters.
+
+const wizard = {
+name: 'merlin',
+health: 50,
+heal(num1,num2) {
+return this.health += num1 + num2;
+}
+}
+
+const archer = {
+name: 'jenifer',
+health: 90,
+}
+
+console.log('1', archer)
+wizard.heal.apply(archer, [50, 30])
+console.log('2', archer)
+
+bind()
+
+bind is used when we want a function to return with a certain type of context  
+unlike call and apply it doesn't run the function, it just return the value and
+it can be used later(function borrowing)
+
+const wizard = {
+name: 'merlin',
+health: 50,
+heal(num1,num2) {
+return this.health += num1 + num2;
+}
+}
+
+const archer = {
+name: 'jenifer',
+health: 90,
+}
+
+console.log('1', archer)
+const healArcher = wizard.heal.bind(archer,100,30)
+healArcher()
+console.log('2', archer)
+
+bind is like a band aid to fix this idea of dynamicaly scoped 'this' keyword
+
+Exercise:
+
+const array = [1,2,3];
+ 
+function getMaxNumber(arr){
+  //code here  
+}
+ 
+getMaxNumber(array) // should return 3
+
+Solution
+ const array = [1,2,3];
+
+// in this case, the 'this' keyword doesn't matter!
+function getMaxNumber(arr){
+  return Math.max.apply(null, arr);  //as the parameteter is an array we have to use apply here
+}
+
+getMaxNumber(array)
+
+bind() and currying
+
+function multiply(a,b) { //in this function we have to pass two parameter to run
+return a*b
+}
+
+let multi multiplyByTwo = multiply.bind(this,2) // here we borrowed the multiply method for 
+                                                 // multiplyByTwo and assigned one parameter 
+                                                 // here this refers to wondow object
+console.log(multiplyByTwo(4))
+
+ANother example:
+let multiplyByTen = multiply.bind(this, 10)
+
+console.log(multiplyByTen(4))
+
+When a mthod has function bound to it , there this refers to window object
+
+var b = {
+name : 'jay'
+say() {console.log(this)}
+}
+b.say()
+
+var c = {
+name : 'jay'
+say() {return function() {console.log(this)}}
+}
+c.say()() //when there is a nested function it has to be called this way
+
+var d = {
+name : 'jay'
+say() {return () => console.log(this)}
+}
+d.say()()
+
+Exercise:
+
+const character = {
+  name: 'Simon',
+  getCharacter() {
+    return this.name;
+  }
+};
+const giveMeTheCharacterNOW = character.getCharacter;
+ 
+//How Would you fix this?
+console.log('?', giveMeTheCharacterNOW()); //this should return 'Simon' bud doesn't
+
+Solution:
+const character = {
+  name: 'Simon',
+  getCharacter() {
+    return this.name;
+  }
+};
+const giveMeTheCharacterNOW = character.getCharacter.bind(character);
+
+
+console.log('?', giveMeTheCharacterNOW());
+
+Context vs Scope:
+
+Context sayss what's the value of this keyword which is a reference to the object that owns
+the executing code. It is determined by how the function is invoked
+
+Context:
+How a function is invoked with the value of this keyword
+ Scope:
+Describes the visibility of the variables
+

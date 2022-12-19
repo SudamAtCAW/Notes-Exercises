@@ -1,0 +1,94 @@
+API Key- 162bdc536c6fb633ff890a33022f5b25
+Token- 5ec8a6db5264e88b7af970a79ce474e93cd7bfedcaae2149c460187fcd590665
+
+Path Parameter:
+Path parameter is given after a colon symbol
+
+Querry parameter:
+Querry parameter is given after a question mark symbol.
+
+Request headers:
+A request header is an HTTP header that can be used in an HTTP request 
+to provide information about the request context, so that the server 
+can tailor the response.
+ For example, the Accept-* headers indicate the allowed and preferred formats of the response.
+Other headers can be used to supply authentication credentials (e.g. Authorization),
+to control caching, or to get information about the user agent or referrer, etc.
+
+Response headers:
+A response header is an HTTP header that can be used in an HTTP response and that doesn't relate
+to the content of the message. Response headers, like Age, Location or Server are used to give a
+more detailed context of the response.
+
+Good Practices:
+1.While writing tests make assertions on ids, keys, and the name of the objects that you are creating.
+2.Instead of parsing the json response data each time in the assertions, we can simply parse it once and can use it multiple times.
+While parsing it we must declare it at the beginning of the code block.
+3.instead of copying and pasting the data we get from the response each time, we can create global variables and set the required response data into it.
+when the use of the global variable is complete we can unset it.
+4.To make our requests more dynamic we can use pre requests to set enviornment and global variables.
+
+Variable Scopes:
+1.If we have a variable with same key and different value in Globalal as well as in Environment, when we call the variable the inner scope
+variable will be called.
+2.Avoid using Global variables as much as possible.If you are using then specify the scope of the variable in request scripts
+Syntax: pm.variables.get("variablename")
+3.Use Environment variables as much as possible.
+Scope getter Syntax: pm.variables.get()
+4.Collection variables are used to store hrad coded values, auth key and tokens. They are alternatives for Environment variables 
+To set a collection variable: pm.collectionVariable.set("variablename","variableValue")
+To get a collection variable: pm.collectionVariable.get("variablename","variableValue")
+5.When you are using different kind of environments for testing, production etc try to make different environments and variables for each environment.
+6.While defining variables in pre request scripts we can even check whether we are in the correct environment or not
+by:  if(pm.environment.get("environment")==="prodiction"{}
+
+Assertions in Postman:
+1.First we have to parse the response body 
+json: pm.response.json()
+xml:xml2Json(responseBody)
+HTML:cheerio(pm.response.text())
+csv:csv-parse/lib/sync
+
+Chai Assertion library:
+syntax example: expect([]).to.be.an('array').that.is.empty;
+while expecting we can also add comments for that assertion
+eg: pm.expect(100).to.eql(101,'must equal 100');
+
+Difference between .eql and .eqal
+.eql: Compares the properties of an object
+.eqal: compares the objects
+ Always use .eql, Avoid .eqal
+While assigning a jason data we have to be dynamic. When we are assigning a 
+property to the variable we have to be dynamic.
+-> when checking the property of an object, make sure to first assign it to a variable, it can be reused in future.
+-> when there is a property whose name is long and contains alpha numericals then we have to 
+specify within single quotes and square brackets
+-> when ever assigning a propert to a variable console.log them for debugging pupose
+
+->Searching for a property and assigning it to a variable
+ let boardStatus;
+for(let key in jsonData.limits){
+console.lg(key, jsonData.limits[key]);
+if(jsonData.limits[key].hasOwnProperty('boards')){
+boardStatus = jsonData.limits[key].boards.totalPermember.status;
+}
+}
+
+Overview of the NodeJs and NPM ecosystem
+NodeJs is a JavaScript runtime environment that can execute JavaScript 
+without opening a browser. Newman runs inside the NodeJs runtime environment
+, so this is why NodeJs needs to be installed (locally on your computer or
+ on the server running Jenkins or any other CI server).
+
+NPM is the Node Package Manager.
+ This is like a repository of projects and has knowledge of what requirements
+ each project has. For example, you want to install Newman, but it depends on
+ other libraries which themselves depend on other libraries. To figure out 
+all the dependencies each project needs, you just need to have NPM installed 
+and NPM will do this work for you. 
+
+newman commands:
+to run a collection : newman run <file name/collection link> --environment <file name/environment link> 
+ro report the colleection in html: --reporters=cli,htmlextra
+
+Know about supertest, just from internet.
