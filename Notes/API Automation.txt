@@ -92,4 +92,3 @@ to run a collection : newman run <file name/collection link> --environment <file
 ro report the colleection in html: --reporters=cli,htmlextra
 
 Know about supertest, just from internet.
-//comentjhsdaksjhjk
