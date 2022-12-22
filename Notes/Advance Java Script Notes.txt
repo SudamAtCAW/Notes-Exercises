@@ -724,3 +724,26 @@ How a function is invoked with the value of this keyword
  Scope:
 Describes the visibility of the variables
 test
+
+Javascript Types: 
+typeof - outputs the type of the value
+5 - number
+true - boolean
+'to be or not to be' - string
+undefined - undefined : absence of defination or there is no return statement of a function
+null - object - absence of value
+Symbol('just me') - symbol(They are used for object properties. So that object properies are unique)
+{} - object             //function and arrays are objects
+[] - object
+function(){} - function
+
+eg: 
+function a() {           //we can also add properties into functions like adding in object
+return 5;
+}
+
+a.hi = 'hihihi'
+console.log(a.hi) // hihihi
+
+In java script all types other than the object type is of Primitive type.
+A primitive type always represents a single value
