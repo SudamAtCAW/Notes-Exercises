@@ -746,4 +746,18 @@ a.hi = 'hihihi'
 console.log(a.hi) // hihihi
 
 In java script all types other than the object type is of Primitive type.
-A primitive type always represents a single value
+A primitive type always represents a single value. It can not be broken into any smaller parts.
+
+When we declare an object
+
+const obj = {
+a : 'Tom'
+}
+
+All pre
+
+true.toString() // 'true'
+
+When we try to access a property of an primitive type it is silently creating a wrapper class
+arround it
+
