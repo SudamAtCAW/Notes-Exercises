@@ -761,3 +761,117 @@ true.toString() // 'true'
 When we try to access a property of an primitive type it is silently creating a wrapper class
 arround it
 
+Array:
+
+var array = [1, 2, 3] or
+
+var array = {
+0: 1,
+1: 2,
+2: 3
+}
+
+to check the type of an array
+Array.isArray([]) //true // Array is a constructor
+Array.isArray({}) // false
+
+Pass by Value || Pass by reference
+
+Pass By Value:
+when we assign a value to a variable it simply copies the value . Or when we assign a varaible
+to another variable it does the same thing. 
+In Primitive Types there is pass by value
+
+var a= 6; 
+var b= a;
+b++;
+
+var a = 6; // changing one doesn't change the other
+var b = 7;
+
+Pass By Reference:
+
+When we assign any object a value it doesn't copies the value. It simply points to that meemory
+location.
+When we assign that object to another object the other object also points out to the same memory
+location.
+Changing one property of an object will change the other's property too.
+
+let obj1 = {name:'Leo', password:'goal'}
+let obj2 = obj1;
+
+obj2.password = 'foul'
+
+console.log(obj1) 
+console.log(obj2)
+
+This can be useful in memory management. Just creating one object and using it multiple times.
+
+But there are times when we don't want other to change our data but they still be able to use
+the data
+In those cases we can use the [].concat() method to make each of the arrays isolated
+Where changing one array's property won't change the proprty of others(cloning)
+
+var c = [1, 2, 3, 4, 5]
+var d = [].concat(c);
+d.push(12344)
+console.log(c) //[1, 2, 3, 4, 5]
+console.log(d) //[1, 2, 3, 4, 5, 12344]
+
+But incase of Objects it is a bit diferent
+to avoid pass by reference here we will use Object.assign({}, obj)
+where {} is the location of the object where the data will be stored and obj is the source of 
+the data.
+
+let obj = {a:'a', b:'b', c:'c'};
+let clone = Object.assign({}, obj) or 
+
+let clone2 = {...obj}
+
+obj.c = 5;
+console.log(clone) //{a:'a', b:'b', c:'c'}
+here the cloned objects remains unchanged even if we changed the source object.
+
+Shallow Clone:
+When we try to clone an object which have a nested object, Shallow clone will occour. When
+we change the nested object or any of it's properties we can see those changes in the cloned 
+objects
+
+eg:
+let obj = {
+a:'a',
+b:'b', 
+c:{
+deep:'try and copy me'}
+};
+
+let clone = object.assign({}, obj);
+let clone2 = {...obj}
+
+obj.c.deep = 'hahaha';
+console.log(obj) //{a:'a', b:'b', c:{deep: 'hahaha'}}
+console.log(clone) //{a:'a', b:'b', c:{deep: 'hahaha'}}
+console.log(clone2) //{a:'a', b:'b', c:{deep: 'hahaha'}}
+
+In shallow clone the cloning only happens on the first level only.
+
+To overcome from this problem we will use superclone method
+JSON.parse(JSON.stringify(obj))
+Here first we will convert the obj into string then we will parse the value into another 
+object.
+
+eg:
+let obj = {
+a:'a',
+b:'b', 
+c:{
+deep:'try and copy me'}
+};
+
+let clone = object.assign({}, obj);
+let clone2 = {...obj}
+
+obj.c.deep = 'hahaha';
+console.log(obj) //{a:'a', b:'b', c:{deep: 'hahaha'}}
+console.log(clone) //{a:'a', b:'b', c:{deep: 'hahaha'}}
+console.log(clone2) //{a:'a', b:'b', c:{deep: 'hahaha'}}

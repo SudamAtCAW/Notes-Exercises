@@ -1,0 +1,19 @@
+How Cypress is different from selenium:
+Cypress gives us completes framework., Faster than selenium, More stable, Cypress can test and mock APIs.It doesn't 
+need test environments.
+It doesn't support IE and Safari.
+Asynchronous code
+No Mobile but Mobile view
+Single domain and single tab
+Not friendly with iframes.
+
+Preparaing Developement Environment:
+Install Chrome browser, Node.js, Git, IDE(VS code)
+
+Clone the Application from the Repo:
+
+Open a new floder for storing the project in it. Open that folder in cmd and run the command git clone url to clone the
+ repo in your local system.
+After installing open that folder in Vs code and in terminal run "npm install" which will look into the dev dependencies
+of package.json file and will download all the required dependencies
+
