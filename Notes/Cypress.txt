@@ -1,3 +1,15 @@
+Cypress Important Topics
+Understand the Framework
+Understand the folder structure 
+where the environment variables are getting saved
+purpose of
+index.js
+plugins.js
+supports.js
+fixtures
+Understand the folder structure and environment configuration.ts
+
+
 How Cypress is different from selenium:
 Cypress gives us completes framework., Faster than selenium, More stable, Cypress can test and mock APIs.It doesn't 
 need test environments.
@@ -12,8 +24,96 @@ Install Chrome browser, Node.js, Git, IDE(VS code)
 
 Clone the Application from the Repo:
 
-Open a new floder for storing the project in it. Open that folder in cmd and run the command git clone url to clone the
+Open a new floder for storing the project in it. Open that folder in cmd and run the command "git clone url" to clone the
  repo in your local system.
-After installing open that folder in Vs code and in terminal run "npm install" which will look into the dev dependencies
+After cloning open that folder in Vs code and in terminal run "npm install" which will look into the dev dependencies
 of package.json file and will download all the required dependencies
+To start the application run the command "npm start"
+After executing this command you can run the cloned application on your local port 4200
 
+Cypress Installation:
+
+In the terminal run the command "npm install cypress --save-dev" which will save cypress as a dev dependency in the 
+package.json file
+
+Open the cypress by running the command "npx cypress open"
+
+Difference between npm and npx
+
+npm is used to download javaScript packages from Node Package Manager , we can run applications locally by npm start.
+by adding a command and key in the scripts block of package.json file
+
+npx is used to execute javaScript packages downloaded by npm.
+
+Folder Structure:
+Whenever we open Cypress for the first time it will create a cypress folder in the root of our project
+Under cypress we will get 3 other folders. e2e, fixtures and support
+
+Under support we have commands and e2e file, 
+e2e is the very first file that is executed by cypress, when cypress is initilized. Here we can import commands ,
+event listeners, and custom packages.
+in commands.js we will store our custom commands
+
+Fixtures folder:
+It represents the place where we can store our json files. it can be used when we are working with the apis
+
+e2e:
+In this folder we store our tests.
+
+cypress.config.js:
+This is the place where we configure the behaviour of the framework, different parameters.
+
+Cypress Configuration:
+
+In will be only done in cypress.config.js
+here we can define our base url or local host port address.
+Spec Pattern:
+Cypress follows the cy.js or cy.ts pattern. We will be using a traditional naming convention spec.js
+In the specPattern key we can add this value specPattern: "cypress/e2e/**/*.{js,jsx,ts,tsx,feature}"
+In the begining of the brackets we can remove cy from it which is shown in the cypress configuration documentation
+Now we can include any spec pattern.
+
+excludeSpecPattern:
+
+excludeSpecPattern: ['**/1-getting-started/*', '**/2-advanced-examples/*']
+
+it will ignore the specified files and only show our test cases.
+
+View Port:
+view port will control the resolution of the screen of cypress
+
+In e2e folder we can create tests with the name of test.spec.js or test.cy.js and it is only possible because of 
+the spec pattern declared in the cypress.config.js
+                                                  
+Cypress 9 vs Cypress 10:
+The integration folder in cy9 has been changed to e2e in cy10   
+The index.js file under support folder in cy9 has been changed to e2e.js. bUt  The function still remains the same.
+The plugins folder in cy9 doesn't exist in cy10
+In cy9 there was a examples folder which contained some demo test cases.In cy10 the demo tests are under e2e folder
+In cy9 the name of the config file was cypress.json but in cy10 it is cypress.config.js
+The base URL and is moved inside the e2e block in cy10
+View port is like a global config(not only for e2e for all i.e unit testing and e2e), that is why it is out side of the
+the e2e block
+
+Cypress removed the plugins folder that had index.js in it.
+in that index.js we had one function module.exports which took two parameters on and config. Inside of this function
+we can add our plugins.
+
+module.exports  = (on, config) =>{
+
+//initialPlugin(on, config);
+//on("task", pearcyHealthCheck);
+//return config;
+}
+
+In cy10 those settings moved to cypress.config.js Inside et2e block we need to create setupNodeEvents
+
+setupNodeEvents(on, config) =>{
+//initialPlugin(on, config);
+//on("task", pearcyHealthCheck);
+//return config;
+}
+
+Inside of the setupNodeEvents we can put all those settings that we were putting in index.js of plugins folder
+
+In cy9 we could all the test by clicking a single button but in cy10 they have removed that button
