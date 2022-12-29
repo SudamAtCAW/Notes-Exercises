@@ -117,3 +117,156 @@ setupNodeEvents(on, config) =>{
 Inside of the setupNodeEvents we can put all those settings that we were putting in index.js of plugins folder
 
 In cy9 we could all the test by clicking a single button but in cy10 they have removed that button
+
+DOM Terminology:
+
+HTML DOM consists of HTMLtags, HTML Attributes and Attribute Values
+HTML Tag Names:
+div comes with opeening tag and closing tag
+input comes with self closing tag
+
+HTML Attributes Names 
+Atributes can be found inside tags, usually they are in red colour.Some tag have some value and some doesn't
+Some tag names are
+data-cy
+id
+nbinput
+placeholder
+type
+
+id and class are also html attribute names, they have a special role in html structure
+class can have multiple values and separated by a space
+HTML Tag Values:
+They are assigned to attribute names. 
+
+TABLE:
+<tbody role> </tbody>
+they ahve rows <tr> </tr>
+rows have columns like <td> </td>
+The values in between angle braces (>here<) is plain text values for that column. It is not visible all of the time.
+If there are 3 dots in between angle braces that means it has some nested contents inside it
+
+Relation between the web elements:
+All elements located above our key element is parent element, 
+All elements which are inside eour key element is child element
+
+Sibling Element:
+The elements whcih are aat the same stage as the key element is in.
+
+Test Structure:
+Every test will start with describe("abc") or context("abc").
+In describe block we can add some description about our test, and then open a call back function with a body
+In that body we will create a it block which will contain a description about the test. Again it will have a call 
+back function with a body.
+ We can add as many tests as we want in the describe block.
+We can also create multiple describe blocks. We can also put describe inside another describe block.
+describe('Test Scenario', () => {
+
+  it('test case desc', () => {
+    //repetative code(log in)
+  });
+});
+
+beforeEach("abc", () =>{
+
+}):
+It is the code for every task. Inside the before each we can put some repeatative code ewquired for each test like 
+log in function. By the help of this we don't need to copy and past the same code for each of the it blocks.
+The beforeEach can only work insdie the describe block.
+
+Types of Locators:
+While writing our tests on the top of our code we can mention reference type as cypress. bY which vs code will support
+and tell us the cypress methods.
+Cypress uses the JQuerry selector engine. Knowing it will bw helpful in cypress.
+Cypress doesn't have the xpath.
+
+/// <reference types="cypress" />
+
+A cypress statement always starts with cy
+
+cy.visit("/")  // we can mention / as our base url when we are running the application on local host
+      .contains("Forms")
+      .click()
+      .get(".menu-title")
+      .contains("Form Layouts")
+      .click()
+
+      //By Tag Name, we dont need to specify any additional data to tell cypress that it is tag name
+      .get("input")
+
+      //By Id, while getting an element by id we have to add it with a # symbol ("#inputEmail")
+      .get("#inputEmail")
+
+      //By Class name, we have add a . (dot) in front of the class name
+      .get(".input-full-width")
+
+      //By Attribute name, we have to specify the attribute name inside square braces with in quotes
+      .get("[placeholder]")
+
+      //By Attributr name and value, same as attribute name, only the attribute value will be within double quotes
+      .get('[placeholder="Email"]')
+
+      //By Class value, here we have to provide the class name and value with in square brackets within doible quotes
+      .get('[class="input-full-width size-medium shape-rectangle"]')
+
+      //By Tag name and Attribute with value, make sure the inside and outside bracket quotes are different from each other
+      .get('input[placeholder="Email"]') // give the tag name and attribute and value within quotes inside square brackets.
+
+      //By two different attributes, just and each of the attributes in one square bracket
+      .get('[placeholder="Email"][type="email"]')
+
+      //By tag name, Attribute with value, ID and class name, add each of the elements respective data which is needed for
+cypress to identify them
+      .get('input[placeholder="Email"]#inputEmail.input-full-width')
+
+      //The most recomended way, create your own attribute by adding it in the source code. 
+When you mention your data locator no dev will change it.
+      .get('[data-cy="imputEmail1"]');
+
+
+While getting an element alwas use cy.contains or custom locatiors, 
+While using text locators always look inti the dom for better understaiding. if it found multiple attributes
+
+When we use cy.contains it will get the first match that it finds on the web page. 
+We can provide more than one parameter to get the exact match of the desired element.
+ cy.contains('[status="warning"]','Sign in').click()
+Here we are telling sypress that find the web element that contains attribute "status" with value "warning" and then 
+which contains Sign In
+
+If a button doesn't contain any unique identifiers then try to find Unique identifiers in that section or parent element
+
+cy.get('#inputEmail3') //getting an element by id
+      .parents('form')  //travelling up by parent command
+      .find('button') //finding the button
+      .should('contain','Sign in')  //asserting the button
+
+First find any element which has an Id. Then travel up by parents command and use find command to locate the button.
+You can also add assertions in that button.
+
+Find command is to only find child elements inside parent elements.
+parents method is to locate parents element from the current element which you are in .
+
+We can also use the find method to find an element which doesn't have any unique identifiers.
+
+Saving The Subject of the Command: (Then and wrap methods)
+
+     //cy.contains('nb-card','Using the Grid').find('[for="inputEmail1"]').should('contain','Email')
+    // cy.contains('nb-card','Using the Grid').find('[for="inputPassword2"]').should('contain','Password')
+    // cy.contains('nb-card','Basic form').find('[for="exampleInputEmail1"]').should('contain','Email address')
+    // cy.contains('nb-card','Basic form').find('[for="exampleInputPassword1"]').should('contain','Password')
+
+The issue with above written code is , it is repetative,
+
+The selenium Way
+const firstForm = cy.contains('nb-card','Using the Grid') //storing the web element in a variable
+const secondForm = cy.contains('nb-card','Basic form') //storing the web element in a variable
+
+finding the web elements:
+firstForm.find('[for="inputEmail1"]').should('contain','Email')
+firstForm.find('[for="inputPassword2"]').should('contain','Password')
+secondForm.find('[for="exampleInputEmail1"]').should('contain','Email address')
+
+the above code won't be working in cypress because javascript is asynchronous, we can not save the context/object/result of the 
+command.
+
+Cypress Style:
