@@ -270,3 +270,264 @@ the above code won't be working in cypress because javascript is asynchronous, w
 command.
 
 Cypress Style:
+ .then Enables you to work with the subject yielded from the previous command.
+ Whenever we use .then function , the parameter of the function becomes a jquery object(not a cypress object anymore)
+
+cy.contains('nb-card','Using the Grid').then(firstForm =>{
+        //this is a jquery method, here we are saving the webelements data and passing the data in a parameter to a 
+        //call back function,  the benifit of using .then is it will only execute when cypress locates the web element
+        //by this way we can store the context/object of the command
+        const firstEmail=firstForm.find('[for="inputEmail1"]').text()
+        //finding a web element  by using the parameter and converting it's data into text and storing it in a variable
+        const firstPassword=firstForm.find('[for="inputPassword2"]').text()
+        //by converting the data into text we will  be able to make assertions on it
+        //expect is a chai assertion command
+        expect(firstEmail).to.equal('Email');
+        //cy.get(firstEmail).click()
+        expect(firstPassword).to.equal('Password')
+
+When making assertions  with JQuery methods we have to use chai library 
+when making assertions with cypress elements we have to use should
+
+To use the variables from then function can only be done by creating another nested function inside then. If we declare
+the method outside of then we will get referencce error.
+
+To convert the Jquery format into cypress format we use the .wrap method on the result from the then function
+ cy.wrap(secondForm).find('[for="exampleInputEmail1"]').should('contain','Email address')
+
+Invoke Command:
+With the help of this this command, we don't have to call the text method for each of the element.
+cy.get('[for="exampleInputEmail1"]').invoke('text').then(text =>{
+      expect(text).to.equal('Email address')
+    })
+
+In the above code called the text method by the help of invoke command and used the result in the parameter of then
+function which can be used for assertions.
+	Invoke functions is used for getting the attributes of the elements and making some assertions on them
+
+Assert Property:
+when selecting dates from calendars, to check the correct dates we need to assert their properties. By using invoke 
+command we can assert on the properties of the elements after clicking on them.
+
+cy.contains('nb-card','Common Datepicker').find('input').then(input =>{
+      //we have to perform a click function on the jquery method
+      //so we have to wrap it to convert it into cypress format
+      cy.wrap(input).click()
+        cy.get('nb-calendar-day-picker').contains('14').click()
+   //checking the value property whcih contains the value of the selected date
+        cy.wrap(input).invoke('prop','value').should('contain','Dec 14, 2022')
+    })
+
+Check Boxes and Radio Buttons:
+While clicking on radio buttons sometimes they are covered by another element. to let cypress to click on them we 
+have to use the command click({force: true}) 
+
+Timed out retrying after 30050ms: cy.click() failed because this element:
+
+<input _ngcontent-jdh-c21="" class="native-input visually-hidden" type="radio" name="undefined" value="undefined">
+
+is being covered by another element:
+
+<span _ngcontent-jdh-c21="" class="outer-circle"></span>
+
+Fix this problem, or use {force: true} to disable error checking
+
+If there are many check boxes we can access them by using their respective index number.
+
+cy.wrap(radioButtons)
+      .eq(1) //accessing the second element by using the index number
+      .check({force: true})
+
+Asserting chekboxes by chai methods
+cy.wrap(radioButtons)
+      .first() // we can also use the index number to access the elements
+      //to force check on elements
+      .check({force: true})
+      .should('be.checked')
+
+In Cypress there is a method to check a check box but there is no methods to uncheck a check box
+to Uncheck a check box we have to perform click() command on it to uncheck it.
+// cy.get('[type="checkbox"]').check({force: true})
+    cy.get('[type="checkbox"]').eq(0).click({force: true})
+    cy.get('[type="checkbox"]').eq(1).check({force: true})
+
+Lists and Drop Downs:
+While locating an elementt we can specify multiple tags in the bracket
+cy.get('nav nb-select')
+Here nav is a tag and so is nb-select
+The drop down elements can only be found when clicked on them once. We have to apply the click command to locate 
+the drop down elements in the DOM.
+After selecting any dropdown as eg: color dark we have to assert the respective css property.
+
+Chrome supports the color formats in rgb, so we have to convert the color code into rgb explicitly.
+
+Dropdowns always contains multiple options, then we have to assert each of them by writing the same code again and again
+
+cy.get('nav nb-select').then(dropdown =>{
+      cy.wrap(dropdown).click()
+      //the below line of code will get the all the elements which are inside the dropdown
+      //.options-list is the class which contains the dropdown elements
+      //nb-otion tag is inside the options-list class and there are 4 of them
+      //we will get all 4 of them
+      cy.get('.options-list nb-option').each((listItem, index) =>{
+
+        //in the html code the texts may contain spaces in them , using trim() command will solve them
+        const itemText = listItem.text().trim()
+         
+
+        //creating an object which contains the rgb values that we will assert with that of the elements
+        const colors = {
+           "Light": "rgb(255, 255, 255)",
+           "Dark": "rgb(34, 43, 69)",
+           "Cosmic": "rgb(50, 50, 89)",
+           "Corporate": "rgb(255, 255, 255)"
+        }
+
+        cy.wrap(listItem).click()
+
+        //asserting that after clicking whether the drop down contains the text option or not
+        cy.wrap(dropdown).should('contain', itemText)
+
+        //checking whether the selected element have the respective css property or not
+        cy.get('nb-layout-header nav').should('have.css', 'background-color', colors[itemText])
+        //as it is a loop, it will click once again after clicking on the all 4 options
+        //by this condition, it won't click on the dropdown once it clicks on all 4 of them once
+        if(index < 3){
+          cy.wrap(dropdown).click()
+        }
+      })
+    })
+  })
+
+select command:
+Cypress have the select command to select each of the element inside the select tag. We can select the elements 
+by their text value or using their attributes.
+Some times the text and value of an element can be different.
+
+WEB Tables:
+
+tbody is the table tag, tr is row tag, and td is column tag
+
+//changing the age value of a table
+ //yielding the result of the row where Larry is a text in the table
+ //tnody is the table tag and tr is the row tag
+ cy.get('tbody').contains('tr', 'Larry').then(tableRow =>{
+  //clicking on the edit button of the row
+  cy.wrap(tableRow).find('.nb-edit').click()
+  //clearing out the age field and typing a new vale
+  cy.wrap(tableRow).find('[placeholder="Age"]').clear().type('25')
+  //again clicking on the check mark to save the entered data
+  cy.wrap(tableRow).find('.nb-checkmark').click()
+  //asserting whether the row contains the entered data or not
+  //while locating there were no unique properties for the age column
+  //here we used the index number of the column to assert our desired value
+  cy.wrap(tableRow).find('td').eq(6).should('contain', '25')
+
+Adding some data in the table and asserting them
+
+//2
+  //adding first name and last name in a table and asserting them
+
+  //clicking on the button which will enable us to insert data
+cy.get('thead').find('.nb-plus').click()
+//finding the row and yielding the the result into a variable
+  cy.get('thead').find('tr').eq(2).then(tablerow =>{
+    //adding first name
+    cy.wrap(tablerow).find('[placeholder="First Name"]').type('Workaholic')
+    //adding last name
+    cy.wrap(tablerow).find('[placeholder="Last Name"]').type('Chimp')
+    //clicking on the check box after adding the values
+    cy.wrap(tablerow).find('.nb-checkmark').click()
+  })
+
+  cy.get('tbody tr').first().find('td').then(tableColumn =>{
+    //locating the columns by the help of their respective index numbers
+    cy.wrap(tableColumn).eq(2).should('contain','Workaholic')
+    cy.wrap(tableColumn).eq(3).should('contain', 'Chimp')
+  })
+
+//Adding values into the filter age field and checking whether the filteres
+  //results are correct or not
+ //Creating an object which will pass one by one elements into the age field
+  const age = [20, 25,35, 200 ]
+//pasing each element of the object as parameter
+  cy.wrap(age).each( age =>{
+    //adding one by one elements from the object into age field
+    cy.get('thead [placeholder="Age"]').clear().type(age)
+     cy.wait(500)
+     //asserting each row that contains the desired value or not
+     cy.get('tbody tr').each(tableRow =>{
+      if( age == 200){
+        cy.wrap(tableRow).should('contain', 'No data found')
+      } else {
+        //accessing the age column by it's index position
+        cy.wrap(tableRow).find('td').eq(6).should('contain', age)
+      }
+     })
+
+Web Date Pickers:
+
+Creating a dynamic method which will select our desired date
+
+    // it('Assert property', ()=>{
+    //   cy.visit("/")
+    //   cy.contains("Forms").click()
+    //   cy.contains("Datepicker").click()
+      
+    //   cy.contains('nb-card','Common Datepicker').find('input').then(input =>{
+    //     //we have to perform a click function on the jquery method
+    //     //so we have to wrap it to convert it into cypress format
+    //     cy.wrap(input).click()
+    //       cy.get('nb-calendar-day-picker').contains('14').click()
+    //       cy.wrap(input).invoke('prop','value').should('contain','Dec 14, 2022')
+    //   })
+    // })
+
+    //The problem with above code is , it is hard coded, we have to change the value again
+    //when we want to assert other dates or it won't work when the date changes
+
+
+    function selectDayFromCurrent(day){
+      //creating a date object which will contain our desired day's value
+      let date = new Date()
+      //getting our desired date by adding some days that we received from the day parameter from the 
+      //selectDayFromCurrent methid
+      date.setDate(date.getDate()+ day)
+      //getting future day value
+      let futureDay = date.getDate()
+      //getting future month value
+      let futureMonth = date.toLocaleString('default', {month: 'short'})
+      //creating a variable which will store day, month, and year of our date
+      //it will be useful while asserting
+      let dateAssert = futureMonth+" "+futureDay+", "+date.getFullYear()
+      //getting the calendar element and using it's ng-reflect-date attribute to gwt it
+      cy.get('nb-calendar-navigation').invoke('attr', 'ng-reflect-date').then(dateAttribute =>{
+        //in this condition we check that if the current month doesn't contain the future month
+        //then it will click on the next month arrow icon until 
+        //it finds the desired month
+        if(!dateAttribute.includes(futureMonth)){
+          cy.get('[data-name="chevron-right"]').click()
+          selectDayFromCurrent(day)
+          //in this condition  we check that if the current month contains the future month
+          //it will select the date from the current month
+        } else{
+          cy.get('nb-calendar-day-picker [class="day-cell ng-star-inserted"]').contains(futureDay).click()
+        }
+      })
+      //returning the dateAssert which can be used in asserting, if we don't return it it can 
+      //not be used out side
+      return dateAssert;
+    }
+    cy.visit("/")
+    cy.contains("Forms").click()
+    cy.contains("Datepicker").click()
+       //getting the calendar field
+    cy.contains('nb-card', 'Common Datepicker').find('input').then(input =>{
+      //clicking on the calendar
+      cy.wrap(input).click();
+      //selecting our desired date
+      let dateAssert = selectDayFromCurrent(255);
+      //asserting the selected date 
+      cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert)
+    })
+  })
