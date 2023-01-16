@@ -531,3 +531,304 @@ Creating a dynamic method which will select our desired date
       cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert)
     })
   })
+
+Pop Ups and Tool Tips:
+Alert and confirms are a part of window object, we have to use the cy.on(window:confirm) command to access the alert window
+
+it("Tool Tips and Pop Ups", () => {
+    cy.visit("/");
+    cy.contains("Modal & Overlays").click();
+    cy.contains("Tooltip").click();
+    //Cypress doesn't have any commands to assert on hover messages
+    //how ever while executing it saves the snapshot of the screen , so we can inspect on that element
+    // and assert it
+    cy.contains("nb-card", "Colored Tooltips").contains("Default").click();
+    cy.get("nb-tooltip").should("contain", "This is a tooltip");
+  });
+
+  it.only("dilog box", () => {
+    cy.visit("/");
+    cy.contains("Tables & Data").click();
+    cy.contains("Smart Table").click();
+     
+    // //1
+    // //alerts and confirms are part of window object 
+    // //while asserting them we  have to use the cy.on command
+    // cy.get('tbody tr').first().find('.nb-trash').click()
+    // cy.on('window:confirm', confirm =>{
+    //   //if the window confirm doesn't fire the below lines of code won't work
+    //   expect(confirm).to.equal('Are you sure you want to delete?')
+    // })
+
+    //2
+      //Creating stubs for mocking our function
+
+      const stub = cy.stub()
+      cy.on('window:confirm', stub)
+      cy.get('tbody tr').first().find('.nb-trash').click().then(() =>{
+        //the stub will be helpful if the window confirm event doesn't fire
+        expect(stub.getCall(0)).to.be.calledWith('Are you sure you want to delete?')
+      })
+
+      cy.get('tbody tr').first().find('.nb-trash').click()
+    cy.on('window:confirm', () => false)
+
+  });
+});
+
+Page Obgect Disign pattern:
+The aim of using Page Object design pattern is to make our code more reusable. If we copy paste any piece of code
+more than two times , there is definately place for refactoring.
+So whenever we are writing a test case the first thing we do is to visit to that URL. So in our test case we use 
+beforeEach to execute the piecce of codes before each test case.
+
+Support file: 
+To include code before your test files, set the supportFile path. By default, supportFile is set to look for one of 
+the following files:
+cypress/support/e2e.js
+cypress/support/e2e.jsx
+cypress/support/e2e.ts
+cypress/support/e2e.tsx
+
+For a given testing type, multiple matching supportFile files will result in an error when Cypress loads.
+Cypress automatically creates an example support file for each configured testing type, which has several commented out examples.
+This file runs before every single spec file. We do this purely as a convenience mechanism so you don't have to import this file.
+
+The support file is a great place to put reusable behavior such as custom commands or global overrides that you want
+applied and available to all of your spec files.
+
+API :
+Cypress has built in server which can intercept browser API requests and  process responses .
+Here is as an rewal world example app which can used for API testing.
+The same can be cloned from this repo "https://github.com/bondar-artem/angular-realworld-example-app".
+Follow the instrctions mentioned in the getting started section.
+
+User name: CypressUser 
+email: talek78542@cmeinbox.com
+Password: Cypress@abc
+
+log in method for the angular app which is reusable
+Cypress.Commands.add('loginToApplication', () =>{
+    cy.visit('/login')
+    cy.get('[placeholder="Email"]').type('talek78542@cmeinbox.com')
+    cy.get('[placeholder="Password"]').type('Cypress@abc')
+    cy.get('form').submit()
+})
+
+Capturing An API request and response:
+While capturing the request we have to define the type of the request and the request URL. And at the time of intercepting
+we csn give it a alias (a name) by using .as . The name can be reused for detecting the API.
+
+cy.intercept('POST', 'https://api.realworld.io/api/articles/').as('postArticle')
+
+the above line of code should be on the top of your it block.
+
+we have to wait for the request to be completed and then capture the request and response data it by:
+
+ cy.wait('@postArticle').then( xhr =>{
+            //Asserting the values of request and response.
+            console.log(xhr)
+            expect(xhr.response.statusCode).to.equal(200)
+            expect(xhr.request.body.article.body).to.equal('This is a body of the article')
+            expect(xhr.response.body.article.description).to.equal('This is a description')
+        })
+
+Stub:
+Stub are used to mock an API respoce. or the response of a window object.we can create our json object in the fixture 
+folder and can use it as our own response for the API call made by the browser.
+//{fixture: 'tags.json'} folder contains the values that the api will receive in response.
+cy.intercept('GET','https://api.realworld.io/api/tags', {fixture: 'tags.json'})
+
+Cypress can read files from fixtures folder by  cy.fixtures('fileName')
+
+//here we are intercepting and mocking  an api by it's method type, and path / instead of listening to the URL we are listening to the path
+        cy.intercept({method: 'Get', path: 'tags'},{fixtures:'tags.json'})
+
+Modifying our Request:
+We can modify the data that we are sending from frontend by 
+
+cy.intercept('POST', 'https://api.realworld.io/api/articles/', (req)  =>{
+        //here we are modifying our reqest, even from frontend we are sending  "This is a description" but in the request we are sending "This is a description 2"
+        req.body.article.description = 'This is a description 2'
+       }).as('postArticle')
+
+Modifying Response:
+We can also mock the responses that we receive from the backend by
+
+cy.intercept('POST', 'https://api.realworld.io/api/articles/', (req)  =>{
+        req.reply(res =>{
+            expect(res.body.article.description).to.equal('This is a description')
+            //here we are modifying the response even we are getting a different response from 
+            //backend
+            res.body.article.description = 'This is a description 2'
+        })
+
+We can also make API requests as a form of object  as shown below, while sending the request the auth token should be 
+sent in the headers and the payload should be sent in the body.
+
+cy.request({
+                url: 'https://api.realworld.io/api/articles/',
+                Headers: {'Authorization': 'Token'+token},
+                method: 'POST',
+                body: bodyRequest
+            }).then( response =>{
+                expect (response.status).to.equal(200)
+            })
+
+Instead of logging in by typing the email and password we can also log in by making the api call and save the needed data in the commands.js file
+and can use each of the data by using their alias.
+
+we can also store the token in the local storage of the browser .
+
+Running Cypress through CLI:
+We can run our tests headlessly by the command: npx cypress run
+we can also run specific test files by : npx cypress run --spec "cypress/e2e/test.spec.js"
+to stop the video recording in Cypress.config.js : videos : false
+we can run tests in desired browser by: npx cypress run --browser browserName
+
+Scripts: 
+In the packagejson there is a scripts block, In which we can mention our own npm scripts.
+An example script: "Cypress:run": "npx cypress run"
+To run our script we have to call it by : npm run Cypress:run
+
+We had to run two command to start our server and start npm. if we try to combine two scripts it won't wait till
+the first one is executed
+It can be possible by installing a npm package
+The command is : npm install --save-dev start-server-and-test
+Add the script in the package.json : "cypress:e2e": "start-test start http-get://localhost:4200 cypress:run"
+And now you can start both cypress and server by npm run cypress:e2e
+
+Environment variables:
+values like username, Password , baseUrl can be saved as a environment variable and can be used wherever required.
+
+Ways to save a env variable:
+
+1.In Cypress.config.json:
+Create a 
+env{
+username: 'talek78542@cmeinbox.com,
+password: 'Cypress@abc,
+baseUrl: 'https://conduit.productionready.io'
+} 
+
+block in the file and add your variables like it is shown above.
+And to call these variables Cypress.env("username")
+
+To make our variable private we have to create a file in the source folder names Cypress.env.json and add the name of
+the file in the .gitigonre file.
+If we  mention variables with same name in the Cypress.env.json file it will over ride the same variable in the Cypress.config.json
+file
+The data in the cypress.env.json will override other datas if they have the same name as in the cypress.env.json
+
+You can also define env variables through the command line  by 
+: npx cypress open --env username=abc@test,paassword=paswrd@abc
+
+By using this command we can create specific commands whcih can contain different creds for different envs
+
+"cy:open_dev": "npx cypress open --env username=abc@test,password=paswrd@abc"
+"cy:open_qa": "npx cypress open --env username=qa@test,paassword=paswrd@qa"
+
+Process Variable:
+to get the value of variable and use it we have to define process variable, they are defined by a $ symbol
+
+eg: "cy:open_process": "npx cypress open --env username=$DB_USERNAME,password=$PASSWORD"
+
+To make our node to listen to those variable whcich passed into it we have to ,mention it in the e2e block 
+ 
+To listen to those process variables we have to write in this way
+const username = process.env.DB_USERNAME
+const password = process.end.PASSWORD
+We can also write a function which will through error when one off the variabele is not passed
+if(!password){
+throw new Error('missing password int the environment variable')
+}
+
+Test Retries:
+The retries feature will rerun our test if it fails for some reason let say for some back end delay or frontend glich.
+We can specify the number of times we want to rerun our test in case it fails.
+
+we can do this by creating a new record in the cypress.config.js file
+
+retries: 1,
+
+We can also create sepearte retries for openMode and runMode(headless)  , while we are running our tests headlessly/ through
+pipelines we have to rerun our tests if it fails some how, we can define the retries for the modes by
+
+retries:{
+runMode: 2,
+openMode:0
+}
+
+we can also pass this retries as an object in any specific test or in a test suite that we want
+
+ it('Verify user can log out successfully', {retries:2}, () => { //the retries is passed as an object
+        cy.contains('Settings').click()
+        cy.contains('Or click here to logout').click()
+        cy.get('.navbar-nav').should('contain','Sign up')
+    });
+
+Reporters:
+
+When running our tests through pipelines by creating reports we can know that which of the tests passed or failed
+and it can be shown to team members for betteruderstanding.
+
+install the multiple mocha junit reporters by running the command
+npm install --save-dev cypress-multi-reporters mocha-junit-reporter
+
+then add the following inthe cypress.json file (if there isn't one then create one)
+--> if you add the following lines of code into cypress.json then when you run the test you will get an error like
+"Cypress doesn't support cypress.json" any more .
+So add the following line of code in the cypress.config.json file 
+
+
+{
+    "reporter": "cypress-multi-reporters",
+  "reporterOptions": {                                                       
+    "configFile": "reporter-config.json"       //create a reporter-config.json file in the root directory
+  }
+}
+
+--> the reporter-config.json file is like a place where we configure the reporters and specify the path 
+where the reports will be saved.
+then add the follwing in the confilg file
+these reporters create separate reports for each spec so we need to merge them
+{
+    "reporterEnabled": "mocha-junit-reporter, mochawesome",
+  "mochaJunitReporterReporterOptions": {
+    "mochaFile": "cypress/results/junit/results-[hash].xml"
+  },
+  "reporterOptions": {
+    "reportDir": "cypress/results/mochawesome",
+    "overwrite": false,
+    "html": false,
+    "json": true
+  }
+}
+we also need to delete our previous reports before before creating a new report, save the below scripts in the 
+package.json file
+ "delete:reports": "rm -r cypress/results/* || true*",
+    "prereport": "npm run dele:reports",
+
+Install the mocha awsome reporter by this command:
+npm install --save-dev mochawesome mochawesome-merge mochawesome-report-generator
+
+Now we will add a script in the package.json which will marge all the mochawesome reports into a single file and generate a 
+html report on them
+
+  "mochawesome:merge":"npx mochawesome-merge \"cypress/results/mochawesome/*.json\" > mochawesome.json && npx marge mochawesome.json" 
+-> \"cypress/results/mochawesome/*.json\" : this line defines from where to take the reports, in our example it is
+mochawesome folder under results folder to avoid the confilct on the double quotes add a backward slash before them
+-> > mochawesome.json : this line will add all the reports into this file
+->  && npx marge mochawesome.json : here we are also attaching another script which will generate the html rreports from 
+the mochawesome.json file.
+
+Now we need to create a report which will merge all the junit reports:
+"junit:merge": "npx junit-merge -d cypress/results/junit -o cypress/results/junit/results.xml"
+-> junit:merge : this the command on which the value code will be executed
+-> npx junit-merge : this command will merge all the reports
+-> -d cypress/results/junit : -d means from where to get the reports, rest of them are the path to that location
+-> -o cypress/results/junit/results.xml : -o means where the target folder will be and cypress/results/junit/ and 
+this line is the path to that directory. , results.xml is the name of the file that will be generated every time.
+
+To start the server and test we need a package which can be downloaded by running the command
+npm install --save-dev start-server-and-test
