@@ -1,0 +1,35 @@
+Kubernetes is an open source technology developed by google, In order to make orchestarting containerized application
+easier
+Kubernetes:Container Orchastration tool
+First we have to understand What a Container is and why we use them?
+A container is 
+->A way to package application with all the necessary dependencies and configuration
+->Portable artifact easily shared and moved around
+->Makes development and deployment more efficient
+
+Where do containers live?
+->Container's repo
+->Private, Public repo
+->Docker repo
+How container's help in development ??
+The process before containers we had to follow!
+->Each developers needs to install the application specific version
+->Installation process different on each os environments
+->Many steps where something could go wrong
+
+How containers solve problems in Developemnent?
+->We dont have to install any of the services directly on our system
+->Packaged with all needed configuration
+->One command to install the application
+->Run the same app with 2 different versions
+->Makes our local environments more efficient
+Before Conatiner for deployment we have to:
+->Textual guide of deployment
+->Configuration on thebserver needed
+->External dependencies on the server OS
+->Problem dependency version
+
+How contaners help in Deployment?
+->Developer and operations work together to package the application in a container
+->No environmental configuration needed on server- except for docker runtime
+->
