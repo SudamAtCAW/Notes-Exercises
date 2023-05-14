@@ -23,13 +23,75 @@ How containers solve problems in Developemnent?
 ->One command to install the application
 ->Run the same app with 2 different versions
 ->Makes our local environments more efficient
+
 Before Conatiner for deployment we have to:
 ->Textual guide of deployment
-->Configuration on thebserver needed
+->Configuration on the webserver needed
 ->External dependencies on the server OS
 ->Problem dependency version
+->To install certain packages we have to run multiple commands and chances of going anything
+wrong is very high
 
 How contaners help in Deployment?
 ->Developer and operations work together to package the application in a container
 ->No environmental configuration needed on server- except for docker runtime
-->
+
+What is a Container?
+->Layers of linux base images, application image with configuration 
+->When it is not running it is just an image with all the packages lying arround
+->When it is running or when puulled the image on local machine and start it, the application starts then it is called a conta iner
+
+Whenever you run a newer version of an image, it just downloads only the missing layers from the previous version
+
+->When running a postgres image you must specify the name, password and version of it otherwise the server wont start
+
+-> Docker command to download postgresql
+docker run --name my-postgres -p 5432:5432 -e POSTGRES_PASSWORD=mypassword -d postgres:9.6
+
+--name: specifies the name of the image , in the above case my-postgres is the name
+-p: it is short for port, by this we can connect our postgress to dbeaver 5432:5432, First one is the host port and second one is the container port
+-e: it refers to environment variables, in the above case POSTGRES_PASSWORD=mypassword is the root password we are specifying
+-d: means detached mode, running in background while we can work on other tasks
+postgres:9.6: means name of the package with version(optional)
+
+This docker run is the sum of to commands docker pull  and  docker start
+to stop the ruuning container : docker stop <container-name>
+to start an existing container: docker start <container-name>
+to check running containers : docker ps
+
+To connect postgresql to dbeaver
+open dbeaver and click on new connection
+then select postgresql 
+in host select local host
+and in password enter the password while downloading the image container
+then clcik on test connection
+after this run a querry select now() and it will show the current date, which means the connection is successful.
+
+Difference between Imaage and Container
+Image is the artefact that has all the dependencies and packages and it can be movable
+And when we run the image basically is called as a container.
+
+While pulling an latest image docker will only download the latest image layers and will skip already existing 
+image layers.
+
+Container Vs Image:
+Image is just a part of container runtime
+Container is the running environment for the Image
+
+commands:
+
+docker ps -a: shows all running and not running containers
+ 
+Container port vs Host Port:
+it can create conflicts if we use the same port for two different containers
+But it is absolutely ok as along as we are binding them to two different ports at the same time
+
+To check the logs of container 
+docker logs <container-name>
+
+Docker exec command:
+docker exec -it <container-if/name>
+This command will provide a integreted terminal for the specific container
+-it: is short for integreted terminal  
+
+-> A Docker image is a small virtual machine which has everything required for running our test

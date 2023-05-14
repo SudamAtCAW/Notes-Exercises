@@ -1,0 +1,48 @@
+X Path Selectors:
+
+/ : selects from root node. 
+
+//: selects nodes in the document from the current node that match the selection no matter where they are 
+
+. : selects the current node
+
+.. : selects the parent of the current node
+
+@ : selects attributes 
+
+Example:
+bookstore: selects all nodes with the name "bookstore"
+
+/bookstore: select the root element bookstore
+
+Note: If the path starts with a slash(/) it always represents an absolute path to an element
+
+bookstore/book: select all book elements that are children of bookstore
+
+//book: selects all book elements no matter where they are in the document
+
+bookstore//book: selects all book elements that are decendant of the bookstore element, no matter where they are under the bookstore element
+
+//@lang selects all the attributes that are named lang
+
+//* :  it is a wild card, whether it is a buttonn, div or a it will select irrespective of it's type
+
+//*[text()='Contact Us'] : it will look for any element which have text value equals to Contact Us
+
+//a[text()='Contact Us'] : it will look for any a tag element which have text value equals to Contact Us
+
+//([text()='Contact Us'])[2] //if we want to select an element by using their index position
+
+//textarea[@id="id name"] : it will find the textarea element which has an id attribute, and whose value equals to id name
+
+//input[contains(@name,'em')] : it will loctae the input elements that have an name attribute and their value contains 'em' as fast characters 
+
+//*[starts-with((text(),"Con")] : to locate any element based on the starting text
+
+//h2[starts-with((text(),"Con")] : to locate an h2 element based on the starting text
+
+//h2[starts-with((text(),"Con")]/following-sibling::ul  : it will selecy the ul element which is following sibling of h2, here forward slash(/) means one level below or an absolute path
+
+//h2[starts-with((text(),"Con")]/following-sibling::ul/*   : it will select all the items that are inside ul element
+
+//a[contains(@href,'contact')]   : it will locate the a tag element which have a href attribute and that attribute contains 'contact' 
